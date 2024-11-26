@@ -39,3 +39,117 @@ Classic is easy to configure, Ruby would take 5000 lines of code but it's also m
 
 CHI implemented from ARM specification, it has the benefits from the classic caches. You can make en MSI into a MOESI. CHI is the best of the two worlds.
 
+
+Cores
+
+How can we actually model Cores in gem5.
+Remember that gem5 is an execute in execute model simulator.
+It can model a CPU in detail.
+Remember yesterday morning I have view a preview of this.
+Most models assume it's for pipelines (fetch, decode, execute, memory)
+
+Separate ISA from CPU model, and we can combine several of these togethers (except for some weaknesses)
+
+Branh Prediction.
+	Easy one, always the same
+		Alway predict taken, or not taken
+	More complicated one, to let you see the difference performance with them.
+		TAGE-based and/or
+		Perceptron-based
+
+Outline
+We'll have an overview on the different models, then a little exercice so you can experiment with them. Get back and make sense of the statistics.
+
+High level view of all the different models in GEM5 (slide 7)
+	SimpleCPU
+		Atomic, very fast functionality of the processor. No details at all. A sequence of nested calls.
+		
+
+		Functional, next level of detail, which has more details about the functionality of the instructions going on the pipeline but doesn't have any timing. Debugging access. You want to find in our System, say you use GDB. What's the value at the address 12. This is how we fake an operating system. Functional addresses to your directory to read and write.
+
+		Timing model, more detail of what the time of the instruction should be.
+
+		AtomicSimpleCPU, a little bit more detailed, it has no contentions or queuing delay (it's fast, the fastest)
+
+		03CPU (Out-Of-Order CPU Model) is the slowest but more detailed model. Every little step you learned in computer architecture is modeled here.
+			Fetch | Decode | Rename | Issue, Execute, Writeback | Commit
+
+			It has many parameters to configure, it's really customisable (gives flexibility). You can use a standard library.
+
+		Minor CPU, a very simple In-Order procesor. It uses latches, used to transfer data between stages. Also very customisable.    
+
+
+The other thing important in gem5 is execution CONTEXT 
+Execution Context  relates to functional units and how things are executed.
+The Thread context relates to .
+
+Exercice 1: Comparing CPU Models
+
+Podes guardar los stats de cada CPU model en un lugar distinto
+ > gem5 --outdir=<outdir-name>
+ 	> gem5 --outdir=cache_O3 cores_models.py
+ > grep "simOps" *cache/stats.txt
+
+
+
+src/sim/mem_state.cc:448: info: Increasing stack size by one page.
+Populating the first and second matrix...
+Done!
+Multiplying the matrixes...
+Done!
+Calculating the sum of all elements in the matrix...
+Done
+The sum is 57238500000
+Total time: 20.879ms
+Total instructions: 33954546
+root@codespaces-36f82b:/workspaces/latin-america-2024/materials/02-Using-gem5/05-cores# ls
+atomic-cache  completed  cores_models.py  m5out  minor  o3  timing-cache
+root@codespaces-36f82b:/workspaces/latin-america-2024/materials/02-Using-gem5/05-cores# mv o3 o3-cache
+root@codespaces-36f82b:/workspaces/latin-america-2024/materials/02-Using-gem5/05-cores# mv minor minor-cache
+root@codespaces-36f82b:/workspaces/latin-america-2024/materials/02-Using-gem5/05-cores# grep "simOps" *cache/stats.txt
+
+atomic-cache/stats.txt:simOps                                   33954560                  # Number of ops (including micro ops) simulated (Count)
+minor-cache/stats.txt:simOps                                    33954579                  # Number of ops (including micro ops) simulated (Count)
+o3-cache/stats.txt:simOps                                       33954560                  # Number of ops (including micro ops) simulated (Count)
+timing-cache/stats.txt:simOps                                   33954560                  # Number of ops (including micro ops) simulated (Count)
+
+atomic-cache/stats.txt:simInsts                                 33954546                   # Number of instructions simulated (Count)
+minor-cache/stats.txt:simInsts                                  33954565                   # Number of instructions simulated (Count)
+o3-cache/stats.txt:simInsts                                     33954546                   # Number of instructions simulated (Count)
+timing-cache/stats.txt:simInsts                                 33954546                   # Number of instructions simulated (Count)
+
+atomic-cache/stats.txt:simTicks                                 12706463484                 # Number of ticks simulated (Tick)
+minor-cache/stats.txt:simTicks                                  15324719274                 # Number of ticks simulated (Tick)
+o3-cache/stats.txt:simTicks                                      9848912562                 # Number of ticks simulated (Tick)
+timing-cache/stats.txt:simTicks                                 20879293806                 # Number of ticks simulated (Tick)
+
+atomic-cache/stats.txt:simSeconds                            0.012706                        # Number of seconds simulated (Second)
+minor-cache/stats.txt:simSeconds                             0.015325                        # Number of seconds simulated (Second)
+o3-cache/stats.txt:simSeconds                                0.009849                        # Number of seconds simulated (Second)
+timing-cache/stats.txt:simSeconds                            0.020879                        # Number of seconds simulated (Second)
+
+
+
+Running in the Atomic CPU when yuo change the cache size it does not change the simulated time. The simulated time from the atomic CPU is meaningless, the atomic is not actually tracking time. If you look at the implementation of timing, minor and 03cpu, when they have a request they do it in a way in which they send the address and then they stop working and wait until they receive a response. That's how timing works. Atomic just calls a function and when it completes in that call stacks, the CPU has the data, it takes 0 times. It does return A time that the processor could use to schedule another event if it wants to, but that time is meaningless. In the other models, time is meaningfull.
+
+ - - - - -- - - - -- - - - -- - - - -- - - - -- - - - -- - - - -- - - - -- - - - -- - - - -
+BENCHMARKS
+From the guest we'll be telling gem5 what's our region of interest in the simulation. What we want to look up to.
+	We may want to communicate from the guest application to the simulator.
+		Exit the simulation
+		Take a checkpoint
+		Where the simulation currently is
+		Many Others.
+
+We'll Override ARM and x86 unused Opcodes to write our own Opcodes.
+
+m5ops
+	1. Annotating Workloads
+	2. gem5-bridge when in full system mode, to boot-up linux (disk images)
+
+
+What might we want to do in the simulator.
+	Reset all statistics to only see those in your region of interest.
+	Or you want to exit the simulation because you're done multplying the matrixes, so why would you want to keep simulating.
+
+	
