@@ -1,0 +1,41 @@
+Cache Hierarchies
+
+1. Classic Cache
+2. Ruby Cache
+
+For the most part you can't use them together.
+
+The whole pooint of Ruby is high fidelity in a flexible way. It's not the Ruby programming language, SLICC is a language to describe cache coherence, how machines interact and so on. SLICC looks a lot like C++, you can't or write these weird C++ statements, Python interprets it with scripts and throws out C++ code. If you're interesetd in learning more you can see the Summer Bootcamp slides.
+
+Classic is faster and you cant do more complex hierarchies, but it's less flexible and detailed.
+
+Some number of Cores with L1D, L1I caches, L2 XBar, shared L3XBar and L3 cache, Membus, Memory. The hierarchy is 
+
+Exercise 1, meeasure the bandwidth. In the next exercise we create a 3-Level hierarchy.
+
+
+Take the memory-test.py and instead of using NoCache use these Caches (L1, L2)
+
+
+
+
+Ruby, the black box.
+Filled with different kind of controllers.
+You create all these controllers and you interconnect them, you pass them off to the interconnect model and all those connect to each other.
+
+Controller models,. You can connect these the way you want.
+There's a simple model, and a 
+
+All you CPUs are connected to Ruby via ports.
+You write SLICC code that defines the state machines, and later on you get C++ code.
+
+
+Slide 38. Book Nagarajan, Sorin, Hill and wood. A primer on Memory consistency and Cache Coherence.
+Coherence protocols, we take this complex table and write it down in code. 
+Slicc generates these tables as well, useful for debugging and .
+
+Ruby vs Classic, the trade-off
+Classic is easy to configure, Ruby would take 5000 lines of code but it's also much more detailed and more flexible.
+
+CHI implemented from ARM specification, it has the benefits from the classic caches. You can make en MSI into a MOESI. CHI is the best of the two worlds.
+
