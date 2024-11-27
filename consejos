@@ -1,0 +1,93 @@
+RESSOURCES
+
+Prebuild things, artifacts which can be used to run gem5 simulations.
+13 categories
+a website where you can search all the resources they have: disk-imgs...
+
+Local resources >> JSON file
+
+You might want to create your own binaries, sources, workloads, suites, locally and use them with obtain resourcecs. To do that you can create your own JSON files. You can use these enveironment variables to pin the resources.
+
+When you specify the resources you have to specify the fileds, the most important beeing the id of the resources and the source_url (how to get the resource)
+
+
+
+MULTISIM
+Gem5 is quite slow because it's single-threaded
+We can run Multiple instances of gem5 in parallel; this is what they do in practice.
+
+Usually what people do is write complex difficult to use bash, and open everything in every window, but this is not very reproducable. In gem5 we want this to be easier to do: MultiSim
+
+
+MultiSim
+Uses Python's multiprocessing module.
+
+Create a python file which creates a bunch of different boards. You have one board that defines all the configuration and attaches the workload to it. 
+
+multisim.add_simulator() takes a simulator you want to add, important give it an ID, where the output will go. If you have multiple simulators with the same ID you'll either get an error or they'll ..
+
+With this you can run all or one simulation.
+gem5 -m gem5.utils.multisim my_script.py 		> run all
+gem5 gem5.utils.multisim my_script.py --list		> list all
+gem5 gem5.utils.multisim my_script.py <id> 		> run one
+
+
+SCONS
+Build system >> scons --help
+
+Build_opts, we built NULL. Compiles faster-
+
+scons menuconfig
+
+Once you've configured it you can build in that directory.
+The standard library is built in all configurations.
+Gem5 takes a lot of time to build, make sure you use the -j option so it uses more cores.
+
+There are two main types of files used to set up gem5's build:
+	SConstruct
+	SConscript
+
+	Scons seemed really cool at the time (using python), they chose to go with scons, here we are 20 years later. We've been stuck with this thing that doesn't have much documentation and has not been updated. Let this be a lesson, choose what it's popular, not what's coolest.
+
+	Since we're stuck with scons, I'll explain a little bit how it works.
+
+	SConstruct, contains definition of things which you use to build new files
+	Sconscript, 
+
+	Since we distribute gem5 open source, we can't support every version on everything. We tested 40 compilers, but if you're outside of it, we don't have enough support for it.
+
+SimObject (simulated model)
+	We've already seen this a little bit, this is the base class for all the models. What it gives us are 1. a way to define the model, 2. a way to parameterize a model, and 3. gather statistics about it.
+
+There we'll be 4 different files you'll care about,
+	1. The declaration file, the interface within Python and C++, you define the parameters to be able to set in the C++ model.
+	One common mistake is they find these SImObject declaration type, change the values there to change the parameter model. But the right way to do that is to inherit from that python class and override. Don't modify things in gem5 src unless you're modifying the gem5 model.
+	2. header file, declares the simojbect class in c++
+	3. source file, implements everything in the model in c++
+	4. SimObjectParams headerfile, auto-generated.
+
+	When this exercice was developped it was a live exercise. He was writing code in the screen and everybody else was typing. If you run into problems just let us know.
+
+
+
+
+GOOGLE SCHOLAR > buscar los autores, la universidad, filtrar cosas chamuyo
+
+	WHITE PAPERS
+
+	Es mas chamuyo que un paper tecnico, pero mucho menos que el marketing
+
+	IEEE Security and Privacy
+	IEEE Access
+	Eurosys
+	KeyStone
+
+
+Refresh, gem5 es a discrete event simulator.
+	In the example today m5.simulate, the implementation of the function does this, a while loop, pops, execute and queues until there's an exit.
+
+	All SimObjects can enqueue events onto the event queue (it has access to it)
+	Schedule events later on (current_time + delay)
+
+
+Exercise, create your own event, constructor fires an event at some rate, ex 10 hellos every 50.000 ticks apart. After that you can add a new SimObject that calls, after some hellos says goodbye. After we finish that, tomorrow we get into memory.
