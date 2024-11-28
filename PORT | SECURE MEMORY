@@ -1,0 +1,40 @@
+PORT | SECURE MEMORY
+
+After that we dive into the PORT section
+
+Later Secure Memory Object
+
+CPU -- Cache -- Secure Memory controller -- Memory
+					|
+					| Metadata Cache
+
+Secure memory protocol'll create additional memoery requests. It'll have to wait for all the metadata to come back, the verifications and send Data Requests that come along. MerkleTree
+
+1st step, receive packages, put them in queue and send them on
+2nd step, 
+
+
+RequestPorts
+ResponsePorts
+Data
+
+Packets		< packet.hh (Class Packet)	< PacketPtr = Packet*
+	Addr
+	Data
+	MemCmd (readRew|readResp|writeReq|writeResp|...)
+	RequestorID
+
+Request/Responde Modes
+	Timing (advance simulator time)
+	Atomic (immediate, does not advance simulator time, this is done by the original requestor)
+	Functional (chain of function calls)
+
+
+git stash
+git pull
+git stash pop
+
+If you have your own Fork do
+	git stash
+	git pull [upstream main]
+	git stash pop
