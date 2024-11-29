@@ -1,0 +1,64 @@
+FULL SYSTEM MODE
+
+Booting Up a Real System in Gem5.
+We don't have a full bios implementation, instead we just copy the kernel binary somewhere in the memory and boot it.
+
+For ARM and RISKV we might need a bootloader as well.
+
+How does GEM5 know if it's in FS or SE mode? When you're running GEM5 yuo need to tell him right from the beginning.
+
+We were using set_SE_binary, now we use set_kernel_disk_workload
+
+You can access the RUNNING SYSTEM using the SERIAL CONSOLE (with the m5term utility).
+
+Use x86 port and when you add the port that should be after you set the port
+
+
+
+
+ / / / / / / /
+
+ Basics of Booting Up a Real System in gem5
+ 	-Disk Image (OS, software & data)
+ 	-Kernel Binary (compatible with sim arch) to boot the OS
+
+ 	-Bootloader
+
+
+ Checkpointing, we'll save the architectural state.
+Run to a point, save, and we'll potentially restore with many kind of systems.
+Saves some microarchitectural state, every model in gem5 gets to choose how it checkpoints itself. There's limitations when checkpointing, by which state is beeing saved. 
+	There's thing you can actually not change, 
+		the number of cores, Linux would get very confused;
+		the size of the memory
+		the workload and its dependencies
+
+	Thing you can change
+		the cpu model
+
+
+Summary, when would you want to use KVM or Checkpointing?
+
+
+
+SAMPLING (not getting over the whole execution)
+	Targeted, when you know where to sample: split up in chunks and see which are more similar to each others. We'll assume all the other ones behave as the same one. SIM-POINT, LOOP-POINT
+		SimPoint, decide if these things are similar. Block Vectors, 2 chunks of code or intervals are similar if they're executing similar code. You run an analysis pass and interject these vectors.
+
+	Statistical, we have the same programs and we randomly sample much smaller chunks of the program. After a set amount of time we can ..., average, confidence level. Statistical samples you can get error bounds on your metric of interest.
+		SMARTS & FullSpeedAhead (FSA)
+
+		Does statistial contemplate random distribution? Samples are normally distributed, even if the actual population is not normally distributed the sampling is. You assume the variance is normally distributed.
+
+
+Simpoints uses instructions to mesure time. SimPoint will only work with single-threated applications.
+
+Gem5 we have infrastructure for SimPoint, LoopPoint, ELFie (new technique to get kind of SimPoints or Checkpoints that are valid x86 binaries), SMARTS and FSA (Smarts with KVM).
+
+
+Summary, trade-offs. The big trade-off is, 
+	When you do TARGETED sample you need to do analysis step with ATOMIC cpu, you have to have details on all the base factors. It'll take a very significant amount of time to do the analysis. Then do the clustering, run the workload again from the beggining to end to get the checkpoints you're intereseted in. This can take months. But one big benefit is you can compare apples to apples directly.
+
+	When you do STATISTICAL sample on the other hand, is better, you don't need all the checkpoinst, you don't have to do a prior analysis. You still have to run the workload from begginning to end every single time. And the last thing, the equal cost to change both hardware and software configurations is very important. Unless you're changing the configuration in a big way (ex number of cores).
+
+	Everything is big enough to require sampling. Every paper you read, either the ROI is too small, or you'll need to do sampling. Most people use these kind of sampling.
