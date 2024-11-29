@@ -38,3 +38,43 @@ If you have your own Fork do
 	git stash
 	git pull [upstream main]
 	git stash pop
+
+
+
+Funciones que faltan comparando con inspector_gadget.cc (secure_memory.cc)
+
+						::recvFunctional(PacketPtr pkt)
+
+::CPUSidePort::sendPacket(PacketPtr pkt)
+
+::CPUSidePort::recvRespRetry()
+
+::recvRespRetry()
+
+						::MemSidePort::sendPacket(PacketPtr pkt)
+
+::MemSidePort::recvTimingResp(PacketPtr pkt)
+
+::recvTimingResp(PacketPtr pkt)
+
+						::MemSidePort::recvReqRetry()
+
+						::recvReqRetry()
+
+						::processNextReqSendEvent()
+
+						::scheduleNextReqSendEvent(Tick when)
+
+						::processNextReqRetryEvent()
+
+						::scheduleNextReqRetryEvent(Tick when)
+
+::processNextRespSendEvent()
+
+::scheduleNextRespSendEvent(Tick when)
+
+::processNextRespRetryEvent()
+
+::scheduleNextRespRetryEvent(Tick when)
+
+::..Stats::..Stats(..* ..)
